@@ -75,7 +75,7 @@ or [releases](https://github.com/nakashimas/pyConsoleAnime/releases)
 
 ## License
 
-The _pyConsoleAnime_ project is licensed under the terms of the [BSD 2-Clause](./LICENSE).
+The _pyConsoleAnime_ project is licensed under the terms of the [MIT](./LICENSE).
 
 ## Author
 
