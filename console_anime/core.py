@@ -173,7 +173,6 @@ class MultiStringBinaryImage(BasicImage):
         pass
     # ======================================================================== # 
 
-
 class BasicConsoleAnime:
     """BasicConsoleAnime
 
@@ -276,19 +275,18 @@ class BasicConsoleAnime:
     def SetFooter(self, x):
         self.footer = x
 
-if __name__=='__main__':
-    _o = BasicBinaryImage(width = 50, height = 30)
-    _o.SetLayers(_o.Convert("./out.mp4"))
-    _anime = BasicConsoleAnime(width = 50, height = 30)
-    _anime.SetLayers(_o)
-    _anime.Run()
+def from_youtube(url, filename = "./from_youtube.%(ext)s"):
+    opts = {
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "outtmpl": filename
+    }
+    with youtube_dl.YoutubeDL(opts) as ydl:
+        ydl.download([url])
+    _tmp = BasicBinaryImage()
+    _tmp.SetLayers(_tmp.Convert(filename))
+    return _tmp
 
-    # opts = {
-    #     "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-    #     "outtmpl": "./out.%(ext)s"
-    # }
-    # with youtube_dl.YoutubeDL(opts) as ydl:
-    #     # 動画の本体と情報を取得
-    #     ydl.download(["https://youtu.be/FtutLA63Cp8"]) # returned 0
+if __name__=='__main__':
+    pass
     
     

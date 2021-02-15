@@ -40,12 +40,17 @@ _pyConsoleAnime_ is a kind of toy that plays animations on the command line.
 
 ## Usage
 
+example
+
 ```py
 from console_anime import *
-my_img = BasicBinaryImage(width = 50, height = 30)
-my_img.SetLayers(my_img.Convert("./out.mp4"))
-my_anime = BasicConsoleAnime(width = 50, height = 30)
+
+my_img = BasicBinaryImage()
+my_img.SetLayers(my_img.Convert("path/to/video.mp4"))
+
+my_anime = BasicConsoleAnime(my_img)
 my_anime.SetLayers(_o)
+
 my_anime.Run()
 ```
 
