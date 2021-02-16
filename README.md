@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/badge/build-passing-brightgreen">
   </a>
   <a href="https://github.com/nakashimas/pyConsoleAnime/releases">
-    <img src="https://img.shields.io/badge/releace-v0.0.1-58839b.svg?style=flat">
+    <img src="https://img.shields.io/badge/releace-v0.0.0-58839b.svg?style=flat">
   </a>
   <a href="./LICENSE">
     <img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat">
