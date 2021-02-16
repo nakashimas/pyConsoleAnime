@@ -75,7 +75,7 @@ MultiStringBinaryImageはグレースケールにした画像をAscii文字で�
 変換が遅い(要改良)です.kernel_size引数を下げたり, frame_rate引数を下げたりして精度を落とすと,
 早くなります. 
 
-また, 単にlow_passやhigh_passパラメータを設定しても早くなります. その場合, 値がhigh_passよりも大きい場合に「M」に, low_passよりも小さい場合に「 」が割り当てられます.
+また, 単にlow_passやhigh_passパラメータを設定しても早くなります. その場合, 値がhigh_passよりも大きい場合に「M」が, low_passよりも小さい場合に「 」が割り当てられます.
 
 **youtubeの動画を変換して再生する方法. (BadApple!!を例に)**
 

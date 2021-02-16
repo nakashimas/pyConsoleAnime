@@ -359,6 +359,17 @@ def basic_binaly_from_youtube(url, filename = "./from_youtube.%(ext)s", **kwargs
     _tmp.SetLayers(_tmp.Convert(filename))
     return _tmp
 
+def multi_string_binaly_from_youtube(url, filename = "./from_youtube.%(ext)s", **kwargs):
+    opts = {
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "outtmpl": filename
+    }
+    with youtube_dl.YoutubeDL(opts) as ydl:
+        ydl.download([url])
+    _tmp = MultiStringBinaryImage(**kwargs)
+    _tmp.SetLayers(_tmp.Convert(filename))
+    return _tmp
+
 if __name__=='__main__':
     pass
     
