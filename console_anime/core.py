@@ -136,8 +136,9 @@ class MultiStringBinaryImage(BasicImage):
         None
     """
     # ======================================================================== # 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, kernel_size = 32, **kwargs):
         BasicImage.__init__(self, *args, **kwargs)
+        self.kernel_size = kernel_size
     def __str__(self):
         return "BasicBinaryImage"
     # ======================================================================== # 
@@ -173,6 +174,7 @@ class MultiStringBinaryImage(BasicImage):
                 frame = np.reshape(frame, (1, int(_height), int(_width), 3))
                 frame = np.sum(frame, axis = 3) / 3
                 frame = frame[0]
+                frame = self._convert(frame)
                 frame = "\n".join(["".join(["#" if j > 127 else " " for j in i]) for i in frame])
                 # 追加
                 _output.append(frame)
@@ -286,6 +288,28 @@ class BasicConsoleAnime:
         self.header = x
     def SetFooter(self, x):
         self.footer = x
+
+def make_ascii_dict(width = 64, height = 128, img_write = False):
+    _str = repr(string.printable)[:-16]
+    _output = np.ravel(np.zeros((height, width)))[None,:]
+    img = np.zeros((90, 50, 3))
+    if img_write:
+        cv2.imwrite("./_resource/base.png", img)
+    for idx, i in enumerate(_str):
+        img = cv2.imread("./_resource/base.png")
+        img_p = Image.fromarray(img)
+        d = ImageDraw.Draw(img_p)
+        d.text((2.5,0), i, font = ImageFont.truetype("./_resource/fonts/msgothic.ttc", 90), fill = (255, 255, 255))
+        img = np.array(img_p)
+        img = cv2.resize(img, (width, height))
+        kernel = np.ones((8,8),np.float32) / 25
+        img = cv2.filter2D(img, -1, kernel)
+        img = cv2.GaussianBlur(img, (15, 15), 3)
+        if img_write:
+            cv2.imwrite("./_resource/gen/" + str(idx) + ".png", img)
+        _output = np.append(_output, np.ravel(np.mean(img, axis = 2))[None,:], axis = 0)
+    _str = " " + _str
+    return _output, _str
 
 def basic_binaly_from_youtube(url, filename = "./from_youtube.%(ext)s", **kwargs):
     opts = {
