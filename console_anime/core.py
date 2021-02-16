@@ -1,9 +1,10 @@
 ﻿#!Python3.8
 # -*- coding: utf-8 -*-
 
-import sys, os, time, subprocess
+import sys, os, time, subprocess, string
 import numpy as np
 import tqdm
+from PIL import Image, ImageDraw, ImageFont
 
 try:
     import youtube_dl
@@ -21,9 +22,10 @@ class BasicImage:
         None
     """
     # ======================================================================== # 
-    def __init__(self, width = 32, height = 32):
+    def __init__(self, width = 32, height = 32, frame_rate = 12):
         self.width = width * 2
         self.height = height
+        self.frame_rate = frame_rate
         self.timeline = []
         self._c_timeline = []
     def __iter__(self):
@@ -87,7 +89,7 @@ class BasicBinaryImage(BasicImage):
         # フレームレートを変更
         _tmp_file = "./_" + os.path.splitext(os.path.basename(x))[0] + ".mp4"
         if fit_fr:
-            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 {_tmp_file}')
+            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r {self.frame_rate} {_tmp_file}')
         else:
             _tmp_file = x
         # 動画を読み込み
@@ -136,20 +138,57 @@ class MultiStringBinaryImage(BasicImage):
         None
     """
     # ======================================================================== # 
-    def __init__(self, *args, kernel_size = 32, **kwargs):
+    def __init__(self, *args, kernel_size = 32, high_cut = None, low_cut = None, **kwargs):
         BasicImage.__init__(self, *args, **kwargs)
         self.kernel_size = kernel_size
+        self.high_cut = high_cut
+        self.low_cut = low_cut
+        if self.low_cut is None:
+            self.low_cut = -1
+        if self.high_cut is None:
+            self.high_cut = 1E+99
+        # fit用のデータ
+        self.printable_strings = ""
+        self.string_params = None
     def __str__(self):
         return "BasicBinaryImage"
     # ======================================================================== # 
     def _convert(self, x):
-        # 最適な文字を与える
-        pass
+        if self.string_params is None:
+            self.string_params, self.printable_strings = make_ascii_dict(
+                width = self.kernel_size, height = self.kernel_size * 2
+            )
+        # 畳み込みを作成
+        _output = []
+        img = x
+        _outshape = (int(img.shape[1]), int(img.shape[0]))
+        img = cv2.resize(img, None, fx = self.kernel_size, fy = self.kernel_size * 2)
+        for y in range(_outshape[1]):
+            for x in range(_outshape[0]):
+                # カーネル作成
+                _kernel = np.ravel(
+                    img[
+                        (y * self.kernel_size * 2):((y + 1) * self.kernel_size * 2), 
+                        (x * self.kernel_size):((x + 1) * self.kernel_size)
+                    ]
+                )
+                if np.sum(_kernel) < self.low_cut:
+                    _output.append(" ")
+                elif np.sum(_kernel) > self.high_cut:
+                    _output.append("#")
+                else:
+                    # 繰り返し
+                    _kernel = np.repeat(_kernel[None, :], self.string_params.shape[0], axis = 0)
+                    # ユークリッド距離が最小のものを選択
+                    _euc = np.argmin(np.sqrt(np.mean((_kernel - self.string_params) ** 2, axis = 1)))
+                    _output.append(self.printable_strings[_euc])
+            _output.append("\n")
+        return "".join(_output)
     def Convert(self, x, fit_fr = True):
         # フレームレートを変更
         _tmp_file = "./_" + os.path.splitext(os.path.basename(x))[0] + ".mp4"
         if fit_fr:
-            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 {_tmp_file}')
+            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r {self.frame_rate} {_tmp_file}')
         else:
             _tmp_file = x
         # 動画を読み込み
@@ -169,13 +208,11 @@ class MultiStringBinaryImage(BasicImage):
                 if ret == False:
                     break
                 # 加工
-                frame = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)[1]
                 frame = cv2.resize(frame, None, fx = _fx, fy = _fy)
                 frame = np.reshape(frame, (1, int(_height), int(_width), 3))
-                frame = np.sum(frame, axis = 3) / 3
+                frame = np.mean(frame, axis = 3)
                 frame = frame[0]
                 frame = self._convert(frame)
-                frame = "\n".join(["".join(["#" if j > 127 else " " for j in i]) for i in frame])
                 # 追加
                 _output.append(frame)
         cap.release()
