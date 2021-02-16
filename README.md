@@ -48,9 +48,17 @@ from console_anime import *
 my_img = BasicBinaryImage()
 my_img.SetLayers(my_img.Convert("path/to/video.mp4"))
 
-my_anime = BasicConsoleAnime(my_img)
-my_anime.SetLayers(_o)
+my_anime = BasicConsoleAnime()
+my_anime.SetLayers(my_img)
 
+my_anime.Run()
+```
+
+```py
+from console_anime import *
+my_img = basic_binaly_from_youtube("https://youtu.be/FtutLA63Cp8", filename = "./tmp.mp4", width = 48, height = 36)
+my_anime = BasicConsoleAnime(width = 48, height = 36)
+my_anime.SetLayers(my_img)
 my_anime.Run()
 ```
 
@@ -71,6 +79,10 @@ optional
 See also [requirements.txt](./requirements.txt).
 
 ## Download
+
+```sh
+pip install git+https://github.com/nakashimas/pyConsoleAnime
+```
 
 ```sh
 git clone --depth 1 https://github.com/nakashimas/pyConsoleAnime

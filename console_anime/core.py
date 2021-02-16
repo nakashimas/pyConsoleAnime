@@ -85,10 +85,13 @@ class BasicBinaryImage(BasicImage):
     # ======================================================================== # 
     def Convert(self, x, str_white = "#", str_black = " ", fit_fr = True):
         # フレームレートを変更
+        _tmp_file = "./_" + os.path.splitext(os.path.basename(x))[0] + ".mp4"
         if fit_fr:
-            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 tmp.mp4')
+            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 {_tmp_file}')
+        else:
+            _tmp_file = x
         # 動画を読み込み
-        cap = cv2.VideoCapture("./tmp.mp4")
+        cap = cv2.VideoCapture(_tmp_file)
         _fr = int(cap.get(cv2.CAP_PROP_FPS))
         _total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         ret, frame = cap.read()
@@ -113,6 +116,9 @@ class BasicBinaryImage(BasicImage):
                 # 追加
                 _output.append(frame)
         cap.release()
+        if fit_fr:
+            if os.path.exists(_tmp_file):
+                os.remove(_tmp_file)
         return _output
     def Deconvert(self):
         pass
@@ -140,10 +146,13 @@ class MultiStringBinaryImage(BasicImage):
         pass
     def Convert(self, x, fit_fr = True):
         # フレームレートを変更
+        _tmp_file = "./_" + os.path.splitext(os.path.basename(x))[0] + ".mp4"
         if fit_fr:
-            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 tmp.mp4')
+            subprocess.run(f'ffmpeg -y -i {x} -vf "setpts=1.25*PTS" -loglevel quiet -r 12 {_tmp_file}')
+        else:
+            _tmp_file = x
         # 動画を読み込み
-        cap = cv2.VideoCapture("./tmp.mp4")
+        cap = cv2.VideoCapture(_tmp_file)
         _fr = int(cap.get(cv2.CAP_PROP_FPS))
         _total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         ret, frame = cap.read()
@@ -168,6 +177,9 @@ class MultiStringBinaryImage(BasicImage):
                 # 追加
                 _output.append(frame)
         cap.release()
+        if fit_fr:
+            if os.path.exists(_tmp_file):
+                os.remove(_tmp_file)
         return _output
     def Deconvert(self):
         pass
@@ -275,14 +287,14 @@ class BasicConsoleAnime:
     def SetFooter(self, x):
         self.footer = x
 
-def from_youtube(url, filename = "./from_youtube.%(ext)s"):
+def basic_binaly_from_youtube(url, filename = "./from_youtube.%(ext)s", **kwargs):
     opts = {
         "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "outtmpl": filename
     }
     with youtube_dl.YoutubeDL(opts) as ydl:
         ydl.download([url])
-    _tmp = BasicBinaryImage()
+    _tmp = BasicBinaryImage(**kwargs)
     _tmp.SetLayers(_tmp.Convert(filename))
     return _tmp
 
