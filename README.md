@@ -53,7 +53,7 @@ my_anime.SetLayers(my_img)
 my_anime.Run()
 ```
 
-BasicBinaryImageは, 画像を二値化して, 指定した文字で白と黒を置き換える.
+BasicBinaryImageは, 画像を二値化して, 指定した文字で白と黒を置き換えます.
 
 この例は, 勿論, 他の画像変換クラスでも同じ.
 (一番生成が軽量なものはBasicBinaryImage)
@@ -70,7 +70,7 @@ my_anime.SetLayers(my_img)
 my_anime.Run()
 ```
 
-MultiStringBinaryImageはグレースケールにした画像をAscii文字で置換する.
+MultiStringBinaryImageはグレースケールにした画像をAscii文字で置換します.
 
 変換が遅い(要改良)です.kernel_size引数を下げたり, frame_rate引数を下げたりして精度を落とすと,
 早くなります. 
